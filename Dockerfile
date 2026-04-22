@@ -12,12 +12,17 @@ RUN --mount=type=cache,target=/root/.npm npm install -g pnpm
 COPY package.json .
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store pnpm i
 COPY . .
+ENV CI=true
+ENV NODE_ENV=production
+RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN pnpm config set node-linker hoisted    # 或保持默认 isolated
+RUN pnpm install --frozen-lockfile
 RUN pnpm build
 RUN ls -l
 
 # 生产镜像阶段
-# FROM ccr.ccs.tencentyun.com/sumery/nginx-http3:latest AS final
-FROM harbor.apikv.com:5443/sumery/nginx-http3:latest AS final
+FROM ccr.ccs.tencentyun.com/sumery/nginx-http3:latest AS final
+# FROM harbor.apikv.com:5443/sumery/nginx-http3:latest AS final
 
 COPY --from=builder /src/build /etc/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/nginx.conf

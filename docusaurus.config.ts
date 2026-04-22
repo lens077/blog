@@ -4,8 +4,8 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 
 const config: Config = {
-    title: 'Sunery日记',
-    tagline: 'Sunery日记',
+    title: '希曼日记',
+    tagline: '希曼日记',
     favicon: 'img/favicon.ico',
 
     // Set the production url of your site here
@@ -33,7 +33,7 @@ const config: Config = {
         },
     ],
 
-    onBrokenLinks: 'throw',
+    onBrokenLinks: 'warn',
     onBrokenMarkdownLinks: 'warn',
 
     // Even if you don't use internationalization, you can use this field to set
@@ -73,7 +73,7 @@ const config: Config = {
         // Replace with your project's social card
         image: 'img/docusaurus-social-card.jpg',
         navbar: {
-            title: 'Sunery日记',
+            title: '希曼日记',
             logo: {
                 alt: 'My Site Logo',
                 src: 'img/ico.png',
@@ -85,60 +85,65 @@ const config: Config = {
                     type: 'docSidebar',
                     sidebarId: 'tutorialSidebar',
                     position: 'left',
-                    label: 'Side',
+                    label: '首页',
                 },
                 {
-                    to: '/docs/Backend',
-                    label: 'Backend',
+                    to: '/docs/后端',
+                    label: '后端',
                     position: 'left'
                 },
                 {
-                    to: '/docs/DevOps',
-                    label: 'DevOps',
+                    to: '/docs/后端/Golang',
+                    label: 'Golang',
+                    position: 'left'
+                },{
+                    to: '/docs/后端/微服务',
+                    label: '微服务',
                     position: 'left'
                 },
                 {
-                    to: '/docs/Flow',
-                    label: 'Flow',
+                    to: '/docs/开发运维',
+                    label: '开发运维',
                     position: 'left'
                 },
                 {
-                    to: '/docs/Frontend',
-                    label: 'Frontend',
+                    to: '/docs/图绘制',
+                    label: '图绘制',
                     position: 'left'
                 },
                 {
-                    to: '/docs/OS/Mac',
+                    to: '/docs/前端',
+                    label: '前端',
+                    position: 'left'
+                },
+                {
+                    to: '/docs/操作系统/Mac',
                     label: 'Mac',
                     position: 'left'
                 }, {
-                    to: '/docs/OS/Windows',
+                    to: '/docs/操作系统/Windows',
                     label: 'Windows',
                     position: 'left'
                 },
                 {
-                    to: '/docs/Microservice',
-                    label: 'Microservice',
+                    to: '/docs/操作系统/Linux',
+                    label: 'Linux',
                     position: 'left'
                 },
                 {
-                    to: '/docs/Network',
-                    label: 'Network',
+                    to: '/docs/网络',
+                    label: '网络',
                     position: 'left'
                 },
                 {
-                    to: '/docs/SE',
-                    label: 'Software Engineering ',
+                    to: '/docs/工程化',
+                    label: '工程化',
                     position: 'left'
                 },
+
                 {
-                    to: '/docs/OS/Windows',
-                    label: 'Windows',
-                    position: 'left'
-                },
-                {
-                    to: '/docs/Other',
-                    label: 'Other',
+                    to: '/docs/其它',
+                    label: '其它',
                     position: 'left'
                 },
                 {

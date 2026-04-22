@@ -1,4 +1,0 @@
-G:\Anaconda;
-G:\Anaconda\Scripts;
-G:\Anaconda\Library\bin;
-G:\Anaconda\Library\mingw-w64;

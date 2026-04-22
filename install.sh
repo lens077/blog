@@ -1,0 +1,97 @@
+DIR="/home/docker/blog"
+
+mkdir -pv $DIR
+cd $DIR || exit
+
+mkdir -pv $DIR/ssl
+mkdir -pv $DIR/conf
+
+DOMAIN="example.com"
+cp /home/acme/${DOMAIN}/certs/fullchain.cer ssl/${domain}.crt
+cp /home/acme/${DOMAIN}/certs/'*.${domain}.key' ssl/${domain}.key
+
+ls -ld ssl
+chmod 700 ssl
+chmod 644 ssl/*      # 证书文件通常 644 即可
+
+cat > conf/nginx.conf <<EOF
+server {
+    listen 80;
+    server_name ${DOMAIN};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    server_name ${DOMAIN} www.${DOMAIN};
+
+    # HTTP/3 with QUIC
+    listen 443 quic reuseport;
+
+    # HTTP/2 and HTTP/1.1
+    listen 443 ssl;
+    http2 on;
+
+    # Security headers
+    add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload" always;
+    add_header X-XSS-Protection          "1; mode=block" always;
+    add_header X-Frame-Options           SAMEORIGIN always;
+    add_header X-Content-Type-Options    nosniff always;
+    add_header Alt-Svc                   'h3=":443"; ma=86400; h3-29=":443"; ma=86400';
+
+    # SSL/TLS configuration
+    ssl_protocols               TLSv1.3 TLSv1.2;
+    ssl_ecdh_curve              X25519:P-256:P-384;
+
+    # 通用兼容性密码套件
+    ssl_ciphers                 "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256";
+
+    ssl_prefer_server_ciphers   on;
+
+    # 显式声明 TLS 1.3 密码（需要 OpenSSL 1.1.1+）
+    ssl_conf_command Ciphersuites TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256;
+
+    # SSL certificates
+    ssl_certificate     /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+
+    location / {
+        root   /etc/nginx/html;
+        index  index.html index.htm;
+        try_files $uri $uri/ /index.html;
+    }
+}
+
+EOF
+
+ls -ld conf
+chmod +x conf       # 若缺少执行权限
+
+cat > compose.yml <<EOF
+services:
+  blog:
+    image: ccr.ccs.tencentyun.com/sumery/blog:latest # 这里需要替换成你的镜像名
+    container_name: blog
+    build:
+      context: .
+      dockerfile: .
+      target: final
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    restart: on-failure:4 # 重启策略，最多重启n次
+    volumes:
+      - $DIR/conf:/etc/nginx/conf.d
+      - $DIR/ssl:/etc/nginx/ssl:ro
+EOF
+docker compose up -d
+# docker compose down -v
+# docker compose logs -f
+
+# Debug
+# docker exec -it blog sh 进入容器
+# nginx -t 校验配置文件
+# nginx -s reload 重启
+# nginx -g daemon off; 前台启动nginx
+# ls -la /etc/nginx/conf.d/ 检查容器里是否挂载了正确配置文件和权限
+# ls -la /etc/nginx/ssl/ 检查容器里是否挂载了正确证书文件和权限
