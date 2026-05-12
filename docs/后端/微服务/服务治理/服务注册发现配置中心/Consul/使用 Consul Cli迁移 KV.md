@@ -25,6 +25,17 @@ cat consul-kv.json | consul kv import -http-addr=<IP:PORT> -
 consul kv import @consul-kv.json
 ```
 
+TLS:
+```shell
+kubectl get secret -n consul
+
+kubectl get secret consul-root-ca-secret -n consul -o jsonpath='{.data.tls\.crt}' | base64 -d > consul-final-ca.crt
+
+cat consul-local-kv.json | consul kv import \
+  -http-addr=https://consul.sumery.com:443 \
+  -ca-file=consul-final-ca.crt -
+```
+
 输出:
 ![[Pasted image 20250413205931.png]]
 
